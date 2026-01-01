@@ -163,7 +163,7 @@ target_include_directories(${PROJECT_NAME}
     $<BUILD_INTERFACE:${BACKENDS_DIR}>
     $<INSTALL_INTERFACE:include> # ${CMAKE_INSTALL_PREFIX}/include
 )
-target_link_libraries(${PROJECT_NAME} INTERFACE ${IMGUI_INTERFACE_LIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${IMGUI_INTERFACE_LIBS})
 
 if(IMGUI_BACKEND_DX12)
   target_link_libraries(${PROJECT_NAME} PRIVATE d3d12 dxgi)
