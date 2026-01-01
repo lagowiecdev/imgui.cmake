@@ -3,8 +3,6 @@
 #
 cmake_minimum_required(VERSION 3.15)
 
-include(CMakeOptions.cmake)
-
 
 ##################################################################################################################
 # PROJECT
@@ -70,7 +68,29 @@ if(IMGUI_WITH_BACKEND)
     list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_win32.h)
     list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_win32.cpp)
   endif()
-
+  if("${IMGUI_BACKEND_PLATFORM}" STREQUAL "APPLE")
+    message(STATUS "[ImGui] Including backend platform: [APPLE]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_osx.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_osx.mm)
+  endif()
+  if (IMGUI_BACKEND_GLFW)
+    message(STATUS "[ImGui] Including backend api: [GLFW]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_glfw.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_glfw.cpp)
+    list(APPEND IMGUI_INTERFACE_LIBS glfw)
+  endif ()
+    if (IMGUI_BACKEND_SDL2)
+    message(STATUS "[ImGui] Including backend api: [SDL2]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_sdl2.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_sdl2.cpp)
+    list(APPEND IMGUI_INTERFACE_LIBS SDL2)
+  endif ()
+  if (IMGUI_BACKEND_SDL3)
+    message(STATUS "[ImGui] Including backend api: [SDL3]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_sdl3.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_sdl3.cpp)
+    list(APPEND IMGUI_INTERFACE_LIBS SDL3)
+  endif ()
   if(IMGUI_BACKEND_DX9)
     message(STATUS "[ImGui] Including backend api: [Direct3D9]")
     list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_dx9.h)
@@ -97,6 +117,20 @@ if(IMGUI_WITH_BACKEND)
     list(APPEND IMGUI_INTERFACE_LIBS dxgi)
     # list(APPEND IMGUI_INTERFACE_LIBS d3dcompiler)
   endif()
+  if (IMGUI_BACKEND_OPENGL)
+    message(STATUS "[ImGui] Including backend api: [OpenGL]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_opengl2.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_opengl2.cpp)
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_opengl3.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_opengl3.cpp)
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_opengl3_loader.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_opengl3_loader.cpp)
+  endif ()
+    if (IMGUI_BACKEND_VULKAN)
+    message(STATUS "[ImGui] Including backend api: [Vulkan]")
+    list(APPEND PUBLIC_H_FILES ${BACKENDS_DIR}/imgui_impl_vulkan.h)
+    list(APPEND PUBLIC_CXX_FILES ${BACKENDS_DIR}/imgui_impl_vulkan.cpp)
+  endif ()
 endif()
 
 set(PROJECT_FILES
@@ -104,7 +138,6 @@ set(PROJECT_FILES
   ${PUBLIC_CXX_FILES}
   ${FONTS_FILES}
 )
-
 
 ##################################################################################################################
 # IDE REPRESENTATION
@@ -121,13 +154,7 @@ source_group("\\Fonts" FILES ${FONTS_FILES})
 # TARGET
 ##################################################################################################################
 
-if(IMGUI_STATIC_LIBRARY)
-  message(STATUS "[ImGui] Building STATIC library")
-  add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
-else()
-  message(STATUS "[ImGui] Building SHARED library")
-  add_library(${PROJECT_NAME} SHARED ${PROJECT_FILES})
-endif()
+add_library(${PROJECT_NAME} ${PROJECT_FILES})
 add_library(ImGui::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
